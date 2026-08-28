@@ -1,0 +1,19 @@
+{
+  "name": "m3d1",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --env-file=.env src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "openai": "^7.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.3.0"
+  }
+}
