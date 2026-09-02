@@ -18,6 +18,10 @@ export class OpenAIProvider implements AIProvider {
         this.printer = printer;
     }
 
+    async generateTextWithMessages(system: string, history: HistoryEntry[]): Promise<string> {
+        return await this._generateTextWithMessages(system, history)
+    }
+
     async generateText(prompt: string, persona?: keyof typeof PERSONAS): Promise<string> {
         const system = persona ? PERSONAS[persona] : DEFAULT_PERSONA;
         return this._generateText(prompt, system);
@@ -43,6 +47,18 @@ export class OpenAIProvider implements AIProvider {
             messages: [
                 { role: "system", content: system },
                 { role: "user", content: prompt }
+            ],
+        }));
+        
+        return response.choices[0].message.content ?? "";
+    }
+
+    private async _generateTextWithMessages(prompt: string, messages: HistoryEntry[]): Promise<string> {
+        const response = await withRetry(() => this.openai.chat.completions.create({
+            model: this.model,
+            messages: [
+                ...messages,
+                { role: "system", content: prompt }
             ],
         }));
         
