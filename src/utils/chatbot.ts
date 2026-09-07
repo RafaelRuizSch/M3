@@ -3,7 +3,7 @@ import type { AIProvider } from "../contracts/aiProvider";
 import { Conversation } from "../contracts/types.ts";
 import { DEFAULT_PERSONA, PERSONAS } from "../contracts/personas.ts";
 import { SumarizeConversation } from "./sumarize.ts";
-import type { DBProvider } from "../contracts/dbProvider.ts";
+import type { IDocumentsProvider, ISessionProvider } from "../contracts/dbProviders.ts";
 import { capitalize } from "./utils.ts";
 import { maybeCompressHistory } from "./estimateTokens.ts";
 import { stitchContext } from "./stichContext.ts";
@@ -26,18 +26,20 @@ const CONVERSATION_MAX_LENGTH = 6
 
 export class ChatBot {
     private conversation: Conversation;
-    private provider: AIProvider;
+    private aiProvider: AIProvider;
     private persona?: keyof typeof PERSONAS;
     private endChatBot = false;
-    private dbProvider: DBProvider;
+    private sessionProvider: ISessionProvider;
+    private documentProvider: IDocumentsProvider;
     private bannedWords: string[];
     private hallucinationSignals: string[];
 
-    constructor(provider: AIProvider, dbProvider: DBProvider, sessionName: string, bannedWords: string[], hallucinationSignals: string[], persona?: keyof typeof PERSONAS) {
-        this.provider = provider;
+    constructor(aiProvider: AIProvider, sessionProvider: ISessionProvider, documentProvider: IDocumentsProvider, sessionName: string, bannedWords: string[], hallucinationSignals: string[], persona?: keyof typeof PERSONAS) {
+        this.aiProvider = aiProvider;
         this.persona = persona;
-        this.conversation = new Conversation(CONVERSATION_MAX_LENGTH, dbProvider, sessionName);
-        this.dbProvider = dbProvider;
+        this.conversation = new Conversation(CONVERSATION_MAX_LENGTH, sessionProvider, sessionName);
+        this.sessionProvider = sessionProvider;
+        this.documentProvider = documentProvider;
         this.bannedWords = bannedWords;
         this.hallucinationSignals = hallucinationSignals;
     }
@@ -48,7 +50,7 @@ export class ChatBot {
     }
 
     async sumarize() {
-        await SumarizeConversation(this.conversation, this.provider)
+        await SumarizeConversation(this.conversation, this.aiProvider)
         process.stdout.write("Sumarized...");
     }
 
@@ -90,10 +92,10 @@ export class ChatBot {
         }
 
         this.conversation.addUserMessage(userPrompt)
-        const compressed = await maybeCompressHistory(this.conversation, this.provider);
+        const compressed = await maybeCompressHistory(this.conversation, this.aiProvider);
         const stitched = compressed; // stitchContext(undefined, undefined, compressed);
 
-        const response = await this.provider.generateStreamedTextWithHistory(stitched);
+        const response = await this.aiProvider.generateStreamedTextWithHistory(stitched);
         const validateOutputResult = validateOutput(response, this.hallucinationSignals);
 
 

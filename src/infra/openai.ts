@@ -18,6 +18,16 @@ export class OpenAIProvider implements AIProvider {
         this.printer = printer;
     }
 
+
+    async makeEmbedding(text: string): Promise<number[]> {
+        const response = await this.openai.embeddings.create({
+            model: "text-embedding-3-large",
+            input: text
+        });
+        
+        return response.data[0].embedding;
+    }
+
     async generateTextWithMessages(system: string, history: HistoryEntry[]): Promise<string> {
         return await this._generateTextWithMessages(system, history)
     }

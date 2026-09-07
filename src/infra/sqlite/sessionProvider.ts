@@ -1,8 +1,8 @@
-import type { DBProvider } from "../contracts/dbProvider.ts";
+import type { ISessionProvider } from "../../contracts/dbProviders.ts";
 import { DatabaseSync } from "node:sqlite";
-import type { HistoryEntry } from "../contracts/types.ts";
+import type { HistoryEntry } from "../../contracts/types.ts";
 
-export class SQLiteDB implements DBProvider {
+export class SessionProviderDB implements ISessionProvider {
     private db: DatabaseSync;
 
     constructor(dbFilePath: string) {

@@ -5,7 +5,10 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "node --no-warnings --env-file=.env src/index.ts"
+    "dev": "node --no-warnings --env-file=.env src/index.ts",
+    "rag": "node --no-warnings --env-file=.env src/rag.ts",
+    "rag_test": "node --no-warnings --env-file=.env src/rag_test.ts",
+    "rag_test_debug": "node --no-warnings --env-file=.env src/rag_test.ts --debug"
   },
   "keywords": [],
   "author": "",

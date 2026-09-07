@@ -1,4 +1,4 @@
-import type { DBProvider } from "./dbProvider";
+import type { ISessionProvider } from "./dbProviders";
 
 export type HistoryEntry = {
     role: "user" | "assistant" | "system";
@@ -13,15 +13,15 @@ export type ValidationResult = {
 export class Conversation {
     private history: HistoryEntry[]
     private maxHistoryLen: number
-    private dbProvider: DBProvider
+    private sessionProvider: ISessionProvider
     private sessionName: string
 
-    constructor(maxLen: number = 6, dbProvider: DBProvider, sessionName: string) {
+    constructor(maxLen: number = 6, sessionProvider: ISessionProvider, sessionName: string) {
         this.maxHistoryLen = maxLen
-        this.dbProvider = dbProvider
+        this.sessionProvider = sessionProvider
         this.sessionName = sessionName
 
-        this.history = this.dbProvider.loadSession(sessionName)
+        this.history = this.sessionProvider.loadSession(sessionName)
     }
 
     getSessionName() {
@@ -50,7 +50,7 @@ export class Conversation {
     private addMessage(role: HistoryEntry['role'], text: string){
         const historyEntry: HistoryEntry = { role, content: text }
         this.history.push(historyEntry)
-        this.dbProvider.saveSession(this.sessionName, historyEntry)
+        this.sessionProvider.saveSession(this.sessionName, historyEntry)
         this.slidingWindow()
     }
 

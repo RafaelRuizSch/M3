@@ -1,5 +1,5 @@
-import { PERSONAS } from "./personas";
-import type { Conversation, HistoryEntry } from "./types";
+import { PERSONAS } from "./personas.ts";
+import type { Conversation, HistoryEntry } from "./types.ts";
 
 type PersonaKey = keyof typeof PERSONAS;
 
@@ -9,4 +9,5 @@ export interface AIProvider {
     generateStreamedText(prompt: string, persona?: PersonaKey): Promise<string>;
     generateStreamedTextWithHistory(history: HistoryEntry[]): Promise<string>;
     generateWithCritique(prompt: string, persona?: PersonaKey): Promise<string>;
+    makeEmbedding(text: string): Promise<number[]>;
 }
